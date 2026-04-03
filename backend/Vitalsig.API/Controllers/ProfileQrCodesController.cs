@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vitalsig.API.Application.QrCodes;
 
 namespace Vitalsig.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/profiles/{profileId:guid}/qr")]
 public class ProfileQrCodesController(IQrCodeService qrCodeService) : ControllerBase
 {

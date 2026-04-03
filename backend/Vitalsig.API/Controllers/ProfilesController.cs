@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vitalsig.API.Application.Profiles;
 using Vitalsig.API.Application.Profiles.Contracts;
@@ -5,6 +6,7 @@ using Vitalsig.API.Application.Profiles.Contracts;
 namespace Vitalsig.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/profiles")]
 public class ProfilesController(IProfileService profileService) : ControllerBase
 {
