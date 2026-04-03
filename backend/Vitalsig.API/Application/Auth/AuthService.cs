@@ -62,6 +62,22 @@ public class AuthService(
         return jwtTokenService.CreateToken(user);
     }
 
+    public async Task<UserSummaryResponse?> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Users
+            .AsNoTracking()
+            .Where(x => x.Id == userId && x.IsActive)
+            .Select(x => new UserSummaryResponse
+            {
+                Id = x.Id,
+                FullName = x.FullName,
+                Email = x.Email,
+                PhoneNumber = x.PhoneNumber,
+                Role = x.Role
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     private static void ValidateRegisterRequest(RegisterRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.FullName))

@@ -30,6 +30,12 @@ Content-Type: application/json
 
 ###
 
+GET {{Vitalsig.API_HostAddress}}/api/auth/me
+Accept: application/json
+Authorization: Bearer {{BearerToken}}
+
+###
+
 GET {{Vitalsig.API_HostAddress}}/api/profiles
 Accept: application/json
 Authorization: Bearer {{BearerToken}}
@@ -149,6 +155,12 @@ Authorization: Bearer {{BearerToken}}
 ###
 
 POST {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}/qr/regenerate
+Accept: application/json
+Authorization: Bearer {{BearerToken}}
+
+###
+
+GET {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}/scan-logs
 Accept: application/json
 Authorization: Bearer {{BearerToken}}
 
