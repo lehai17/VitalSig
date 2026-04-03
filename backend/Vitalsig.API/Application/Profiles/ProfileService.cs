@@ -7,17 +7,12 @@ namespace Vitalsig.API.Application.Profiles;
 
 public class ProfileService(AppDbContext dbContext) : IProfileService
 {
-    public async Task<IReadOnlyList<ProfileListItemResponse>> GetProfilesAsync(Guid? ownerUserId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<ProfileListItemResponse>> GetProfilesAsync(Guid ownerUserId, CancellationToken cancellationToken)
     {
         var query = dbContext.Profiles
             .AsNoTracking()
             .Include(x => x.EmergencyContacts)
-            .AsQueryable();
-
-        if (ownerUserId.HasValue)
-        {
-            query = query.Where(x => x.OwnerUserId == ownerUserId.Value);
-        }
+            .Where(x => x.OwnerUserId == ownerUserId);
 
         return await query
             .OrderByDescending(x => x.CreatedAtUtc)
@@ -37,25 +32,25 @@ public class ProfileService(AppDbContext dbContext) : IProfileService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ProfileDetailResponse?> GetProfileByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ProfileDetailResponse?> GetProfileByIdAsync(Guid id, Guid ownerUserId, CancellationToken cancellationToken)
     {
         var profile = await dbContext.Profiles
             .AsNoTracking()
             .Include(x => x.EmergencyContacts)
             .Include(x => x.MedicalInfo)
             .Include(x => x.AccessSetting)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == id && x.OwnerUserId == ownerUserId, cancellationToken);
 
         return profile is null ? null : MapToDetailResponse(profile);
     }
 
-    public async Task<ProfileDetailResponse> CreateProfileAsync(CreateProfileRequest request, CancellationToken cancellationToken)
+    public async Task<ProfileDetailResponse> CreateProfileAsync(Guid ownerUserId, CreateProfileRequest request, CancellationToken cancellationToken)
     {
         ValidateProfileRequest(request.DisplayName, request.EmergencyContacts);
 
         var ownerExists = await dbContext.Users
             .AsNoTracking()
-            .AnyAsync(x => x.Id == request.OwnerUserId, cancellationToken);
+            .AnyAsync(x => x.Id == ownerUserId, cancellationToken);
 
         if (!ownerExists)
         {
@@ -65,7 +60,7 @@ public class ProfileService(AppDbContext dbContext) : IProfileService
         var profile = new Profile
         {
             Id = Guid.NewGuid(),
-            OwnerUserId = request.OwnerUserId,
+            OwnerUserId = ownerUserId,
             ProfileCode = GenerateProfileCode(),
             PublicToken = GeneratePublicToken(),
             ProfileType = request.ProfileType,
@@ -106,7 +101,7 @@ public class ProfileService(AppDbContext dbContext) : IProfileService
         return MapToDetailResponse(profile);
     }
 
-    public async Task<ProfileDetailResponse?> UpdateProfileAsync(Guid id, UpdateProfileRequest request, CancellationToken cancellationToken)
+    public async Task<ProfileDetailResponse?> UpdateProfileAsync(Guid id, Guid ownerUserId, UpdateProfileRequest request, CancellationToken cancellationToken)
     {
         ValidateProfileRequest(request.DisplayName, request.EmergencyContacts);
 
@@ -114,7 +109,7 @@ public class ProfileService(AppDbContext dbContext) : IProfileService
             .Include(x => x.EmergencyContacts)
             .Include(x => x.MedicalInfo)
             .Include(x => x.AccessSetting)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == id && x.OwnerUserId == ownerUserId, cancellationToken);
 
         if (profile is null)
         {
@@ -181,9 +176,11 @@ public class ProfileService(AppDbContext dbContext) : IProfileService
         return MapToDetailResponse(profile);
     }
 
-    public async Task<bool> DeleteProfileAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteProfileAsync(Guid id, Guid ownerUserId, CancellationToken cancellationToken)
     {
-        var profile = await dbContext.Profiles.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var profile = await dbContext.Profiles.FirstOrDefaultAsync(
+            x => x.Id == id && x.OwnerUserId == ownerUserId,
+            cancellationToken);
         if (profile is null)
         {
             return false;

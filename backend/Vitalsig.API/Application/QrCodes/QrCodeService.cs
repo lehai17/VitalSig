@@ -8,12 +8,14 @@ namespace Vitalsig.API.Application.QrCodes;
 
 public class QrCodeService(AppDbContext dbContext) : IQrCodeService
 {
-    public async Task<QrCodeResponse?> GetActiveQrCodeAsync(Guid profileId, string publicUrlBase, CancellationToken cancellationToken)
+    public async Task<QrCodeResponse?> GetActiveQrCodeAsync(OwnedQrCodeRequest request, CancellationToken cancellationToken)
     {
         var profile = await dbContext.Profiles
             .AsNoTracking()
             .Include(x => x.QrCodes)
-            .FirstOrDefaultAsync(x => x.Id == profileId, cancellationToken);
+            .FirstOrDefaultAsync(
+                x => x.Id == request.ProfileId && x.OwnerUserId == request.OwnerUserId,
+                cancellationToken);
 
         if (profile is null)
         {
@@ -27,17 +29,19 @@ public class QrCodeService(AppDbContext dbContext) : IQrCodeService
 
         if (activeQrCode is null)
         {
-            return await RegenerateQrCodeAsync(profileId, publicUrlBase, cancellationToken);
+            return await RegenerateQrCodeAsync(request, cancellationToken);
         }
 
-        return MapToResponse(activeQrCode, profile.PublicToken, BuildPublicUrl(publicUrlBase, profile.PublicToken));
+        return MapToResponse(activeQrCode, profile.PublicToken, BuildPublicUrl(request.PublicUrlBase, profile.PublicToken));
     }
 
-    public async Task<QrCodeResponse?> RegenerateQrCodeAsync(Guid profileId, string publicUrlBase, CancellationToken cancellationToken)
+    public async Task<QrCodeResponse?> RegenerateQrCodeAsync(OwnedQrCodeRequest request, CancellationToken cancellationToken)
     {
         var profile = await dbContext.Profiles
             .Include(x => x.QrCodes)
-            .FirstOrDefaultAsync(x => x.Id == profileId, cancellationToken);
+            .FirstOrDefaultAsync(
+                x => x.Id == request.ProfileId && x.OwnerUserId == request.OwnerUserId,
+                cancellationToken);
 
         if (profile is null)
         {
@@ -50,7 +54,7 @@ public class QrCodeService(AppDbContext dbContext) : IQrCodeService
             qrCode.ExpiredAtUtc = DateTime.UtcNow;
         }
 
-        var publicUrl = BuildPublicUrl(publicUrlBase, profile.PublicToken);
+        var publicUrl = BuildPublicUrl(request.PublicUrlBase, profile.PublicToken);
         var dataUrl = GenerateQrPngDataUrl(publicUrl);
 
         var qrCodeRecord = new QrCodeRecord
