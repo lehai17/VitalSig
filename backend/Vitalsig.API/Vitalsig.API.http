@@ -1,6 +1,7 @@
 @Vitalsig.API_HostAddress = http://localhost:5185
 @DemoOwnerUserId = 11111111-1111-1111-1111-111111111111
 @ProfileId = 00000000-0000-0000-0000-000000000000
+@PublicToken = replace-with-public-token-after-create-profile
 
 GET {{Vitalsig.API_HostAddress}}/api/system/health
 Accept: application/json
@@ -107,5 +108,23 @@ Content-Type: application/json
 
 DELETE {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}
 Accept: application/json
+
+###
+
+GET {{Vitalsig.API_HostAddress}}/api/public/p/{{PublicToken}}
+Accept: application/json
+
+###
+
+POST {{Vitalsig.API_HostAddress}}/api/public/p/{{PublicToken}}/scan
+Content-Type: application/json
+
+{
+  "locationText": "Benh vien gan nhat",
+  "latitude": 10.776889,
+  "longitude": 106.700806,
+  "actionType": "Viewed",
+  "note": "Nguoi di duong quet ma de lien he nguoi than"
+}
 
 ###
