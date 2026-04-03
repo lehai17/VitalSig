@@ -1,0 +1,15 @@
+# Visual Studio files
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.doccache
+
+# Node files (cho React sau này)
+node_modules/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db

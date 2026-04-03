@@ -1,0 +1,111 @@
+@Vitalsig.API_HostAddress = http://localhost:5185
+@DemoOwnerUserId = 11111111-1111-1111-1111-111111111111
+@ProfileId = 00000000-0000-0000-0000-000000000000
+
+GET {{Vitalsig.API_HostAddress}}/api/system/health
+Accept: application/json
+
+###
+
+GET {{Vitalsig.API_HostAddress}}/api/profiles?ownerUserId={{DemoOwnerUserId}}
+Accept: application/json
+
+###
+
+POST {{Vitalsig.API_HostAddress}}/api/profiles
+Content-Type: application/json
+
+{
+  "ownerUserId": "{{DemoOwnerUserId}}",
+  "profileType": "Combined",
+  "displayName": "Nguyen Van A",
+  "dateOfBirth": "1948-10-15",
+  "gender": "Male",
+  "identificationNote": "Hay di lac, nho goi nguoi nha",
+  "addressNote": "Quan 3, TP HCM",
+  "isPublic": true,
+  "isActive": true,
+  "emergencyContacts": [
+    {
+      "fullName": "Nguyen Thi B",
+      "relationship": "Con gai",
+      "phoneNumber": "0901234567",
+      "priority": 1,
+      "isPrimary": true
+    }
+  ],
+  "medicalInfo": {
+    "bloodType": "O+",
+    "chronicDiseases": "Tieu duong, huyet ap cao",
+    "allergies": "Di ung penicillin",
+    "currentMedications": "Metformin",
+    "emergencyInstructions": "Neu bat tinh hay goi cap cuu va lien he nguoi nha"
+  },
+  "accessSetting": {
+    "showFullName": true,
+    "showPhoto": true,
+    "showMedicalInfo": true,
+    "showEmergencyContacts": true,
+    "showAddressNote": false,
+    "allowScanLogging": true
+  }
+}
+
+###
+
+GET {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}
+Accept: application/json
+
+###
+
+PUT {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}
+Content-Type: application/json
+
+{
+  "profileType": "Combined",
+  "displayName": "Nguyen Van A Updated",
+  "dateOfBirth": "1948-10-15",
+  "gender": "Male",
+  "identificationNote": "Can ho tro lien he nguoi nha ngay",
+  "addressNote": "Quan 3, TP HCM",
+  "isPublic": true,
+  "isActive": true,
+  "emergencyContacts": [
+    {
+      "fullName": "Nguyen Thi B",
+      "relationship": "Con gai",
+      "phoneNumber": "0901234567",
+      "priority": 1,
+      "isPrimary": true
+    },
+    {
+      "fullName": "Tran Van C",
+      "relationship": "Con trai",
+      "phoneNumber": "0912345678",
+      "priority": 2,
+      "isPrimary": false
+    }
+  ],
+  "medicalInfo": {
+    "bloodType": "O+",
+    "chronicDiseases": "Tieu duong",
+    "allergies": "Di ung penicillin",
+    "currentMedications": "Metformin",
+    "emergencyInstructions": "Goi 115 neu co dau hieu dot quy"
+  },
+  "accessSetting": {
+    "showFullName": true,
+    "showPhoto": true,
+    "showMedicalInfo": true,
+    "showEmergencyContacts": true,
+    "showAddressNote": true,
+    "allowScanLogging": true
+  }
+}
+
+###
+
+DELETE {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}
+Accept: application/json
+
+###
