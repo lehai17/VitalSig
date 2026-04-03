@@ -116,6 +116,16 @@ Accept: application/json
 
 ###
 
+GET {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}/qr
+Accept: application/json
+
+###
+
+POST {{Vitalsig.API_HostAddress}}/api/profiles/{{ProfileId}}/qr/regenerate
+Accept: application/json
+
+###
+
 POST {{Vitalsig.API_HostAddress}}/api/public/p/{{PublicToken}}/scan
 Content-Type: application/json
 
