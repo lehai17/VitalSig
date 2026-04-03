@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Vitalsig.API.Domain.Entities;
+using Vitalsig.API.Infrastructure.Auth;
 
 namespace Vitalsig.API.Infrastructure.Data;
 
@@ -17,6 +18,12 @@ public static class AppDbInitializer
 
         if (demoUser is not null)
         {
+            if (!PasswordHasher.VerifyPassword("Demo@123", demoUser.PasswordHash))
+            {
+                demoUser.PasswordHash = PasswordHasher.HashPassword("Demo@123");
+                await dbContext.SaveChangesAsync();
+            }
+
             return;
         }
 
@@ -26,7 +33,7 @@ public static class AppDbInitializer
             FullName = "Vitalsig Demo User",
             Email = demoEmail,
             PhoneNumber = "0900000000",
-            PasswordHash = "demo-password-not-for-production",
+            PasswordHash = PasswordHasher.HashPassword("Demo@123"),
             Role = "User",
             IsActive = true,
             CreatedAtUtc = DateTime.UtcNow

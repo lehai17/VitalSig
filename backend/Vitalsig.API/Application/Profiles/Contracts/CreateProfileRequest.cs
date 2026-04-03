@@ -4,7 +4,6 @@ namespace Vitalsig.API.Application.Profiles.Contracts;
 
 public class CreateProfileRequest
 {
-    public Guid OwnerUserId { get; set; }
     public ProfileType ProfileType { get; set; } = ProfileType.Combined;
     public string DisplayName { get; set; } = string.Empty;
     public DateOnly? DateOfBirth { get; set; }
