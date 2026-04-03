@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vitalsig.API.Application.Auth;
 using Vitalsig.API.Application.Auth.Contracts;
+using Vitalsig.API.Infrastructure.Auth;
 
 namespace Vitalsig.API.Controllers;
 
@@ -10,6 +11,20 @@ namespace Vitalsig.API.Controllers;
 [Route("api/auth")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me(CancellationToken cancellationToken)
+    {
+        var currentUserId = User.GetUserId();
+        if (!currentUserId.HasValue)
+        {
+            return Unauthorized();
+        }
+
+        var user = await authService.GetCurrentUserAsync(currentUserId.Value, cancellationToken);
+        return user is null ? Unauthorized() : Ok(user);
+    }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {

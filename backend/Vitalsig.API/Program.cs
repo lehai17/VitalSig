@@ -8,6 +8,7 @@ using Vitalsig.API.Application.Auth;
 using Vitalsig.API.Application.Profiles;
 using Vitalsig.API.Application.PublicProfiles;
 using Vitalsig.API.Application.QrCodes;
+using Vitalsig.API.Application.ScanLogs;
 using Vitalsig.API.Infrastructure.Auth;
 using Vitalsig.API.Infrastructure.Data;
 
@@ -72,6 +73,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IPublicProfileService, PublicProfileService>();
 builder.Services.AddScoped<IQrCodeService, QrCodeService>();
+builder.Services.AddScoped<IProfileScanLogService, ProfileScanLogService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 var app = builder.Build();
